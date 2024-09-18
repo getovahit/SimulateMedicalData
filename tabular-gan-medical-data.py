@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pickle
 
 # CTGAN Parameters - Adjust these as needed
 EPOCHS = 300
@@ -24,8 +25,23 @@ COMPRESS_DIMS = (128, 128)
 DECOMPRESS_DIMS = (128, 128)
 CUDA = True
 
+# PHhenotype of interest
+PHENOTYPE = 'CAD'
+
 # Load the data
 data = pd.read_csv('your_data.csv', sep='\t')
+
+# Load new splits
+new_train_samples = list(np.load('new_split_' + PHENOTYPE + '_train.npy').astype(str))
+new_test_samples = list(np.load('new_split_' + PHENOTYPE + '_test.npy').astype(str))
+
+# Add new splits labels to the data
+data['finalsplit'] = 'NA'
+data['eid'] = data['eid'].astype(str)
+data = data.set_index('eid')
+data.loc[new_train_samples, 'finalsplit'] = 'train'
+data.loc[new_test_samples, 'finalsplit'] = 'test'
+data = data.reset_index()
 
 # Remove identifier column but keep split columns
 columns_to_remove = ['eid']
@@ -50,8 +66,8 @@ encoded_df = pd.DataFrame(encoded_cats, columns=encoder.get_feature_names_out(ca
 final_data = pd.concat([data[numeric_columns], encoded_df, data[['set/split', 'finalsplit']]], axis=1)
 
 # Split the data based on the 'set/split' column
-train_data = final_data[final_data['set/split'] == 'train']
-test_data = final_data[final_data['set/split'] == 'test']
+train_data = final_data[final_data['finalsplit'] == 'train']
+test_data = final_data[final_data['finalsplit'] == 'test']
 
 # Remove split columns before training
 train_data = train_data.drop(columns=['set/split', 'finalsplit'])
@@ -75,6 +91,10 @@ model = CTGAN(
 )
 
 model.fit(train_data)
+
+# Save the model in case it's needed later to avoid retraining
+with open('gan_model.pkl', 'wb') as file:
+    pickle.dump(model, file) 
 
 # Generate synthetic data
 num_samples = len(train_data)
