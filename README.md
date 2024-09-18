@@ -42,16 +42,20 @@ Follow these steps to set up the project environment:
    git clone [repository-url]
    cd [repository-name]
    ```
-
-2. (Optional but recommended) Create a virtual environment:
+2. Automatically create the environment (if this is done, skip the next 2 steps) (only compatible with Ubuntu)
    ```
-   python -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   source ./create_env.sh
    ```
 
-3. Install the required packages:
+3. (Optional but recommended) Create a virtual environment:
    ```
-   pip install pandas numpy scikit-learn seaborn matplotlib sdv
+   python -m venv ganvenv
+   source ganvenv/bin/activate  # On Windows, use `ganvenv\Scripts\activate`
+   ```
+
+4. Install the required packages:
+   ```
+   pip install -r gan_requirements.txt
    ```
 
    Detailed package versions:
@@ -62,7 +66,7 @@ Follow these steps to set up the project environment:
    - matplotlib (3.3.0 or higher)
    - sdv (0.13.1 or higher)
 
-4. If you plan to use GPU acceleration, ensure you have CUDA installed and install the appropriate PyTorch version.
+5. If you plan to use GPU acceleration, ensure you have CUDA installed and install the appropriate PyTorch version.
 
 ## Usage
 
@@ -78,12 +82,29 @@ To run the script:
    - Replace `'your_data.csv'` with the path to your input data file.
    - If your target column is not 'AD', replace 'AD' in the `machine_learning_utility_test` function call with your target column name.
 
-3. Run the script:
+3. Place splits files
+   - Place splits files (new_split_*) inside the same directory with the main script
+
+4. Select phenotype
+   - Change the "PHENOTYPE" variable in line 29 of the main script with the phenotype of interest to make the splits accordingly
+
+5. Create results directory
+   - Make sure there is a diretory called "distribution_comparison_Degree" in the same directory as the main script to be used for some of the results outputs, and if it doesn't exist, create one with the same name before proceeding to next step
+
+6. Activate and run (if this is done, skip the next 2 steps) (only compatible with Ubuntu)
+   - Run the following script to activate the virtual environment and use it to automatically run the script by running:
+   source activate_run_env.sh
+
+7. Activate the environment
+   - activate the virtual environment by running:
+   source venv/bin/activate  # On Windows, use `ganvenv\Scripts\activate`
+
+8. Run the script:
    ```
    python tabular_gan_medical_data.py
    ```
 
-4. Review the output files and console messages for results and any error messages.
+9. Review the output files and console messages for results and any error messages.
 
 ## Configuration
 
